@@ -11,6 +11,7 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
 import serverStorageIcon from '../assets/server-storage.png'
 import serverStorageDisabledIcon from '../assets/server-storage-disabled.svg'
+import API_BASE from '../config/api'
 
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -18,8 +19,6 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
   shadowUrl: markerShadow,
 })
-
-const API_BASE = 'http://127.0.0.1:8000'
 
 interface Servidor {
   id?: string | number

@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import oracleLogo from '../assets/oracle.png'
 import { setAuthenticated } from '../utils/auth'
-
-const API_BASE = 'http://127.0.0.1:8000'
+import API_BASE from '../config/api'
 
 function EyeOnIcon() {
   return (

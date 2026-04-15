@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { normalizeCountryLabel } from '../utils/countryLabel'
-
-const API_BASE = 'http://127.0.0.1:8000'
+import API_BASE from '../config/api'
 
 interface FormData {
   nome: string

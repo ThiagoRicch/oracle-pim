@@ -8,8 +8,7 @@ import { LoadingPage } from '../components/LoadingSpinner'
 import oracleLogo from '../assets/oracle.png'
 import serverActiveImage from '../assets/server-active.png'
 import { normalizeCountryLabel } from '../utils/countryLabel'
-
-const API_BASE = 'http://127.0.0.1:8000'
+import API_BASE from '../config/api'
 
 const QUICK_LINKS = [
   {

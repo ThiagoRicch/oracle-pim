@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import serverActiveImage from '../assets/server-active.png'
 import { IconPencil, IconRefreshCcw } from './icons'
 import { LoadingSpinner } from './LoadingSpinner'
-
-const API_BASE = 'http://127.0.0.1:8000'
+import API_BASE from '../config/api'
 
 const COUNTRY_ISO2_BY_NAME: Record<string, string> = {
   brasil: 'BR',
