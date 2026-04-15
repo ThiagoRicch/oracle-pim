@@ -6,6 +6,7 @@ export function normalizeCountryLabel(value: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
+    .trim()
 
   const alias: Record<string, string> = {
     nova: 'Nova Zelândia',
@@ -13,6 +14,7 @@ export function normalizeCountryLabel(value: string): string {
     'nova zelândia': 'Nova Zelândia',
     'nova zealandia': 'Nova Zelândia',
     'new zealand': 'Nova Zelândia',
+    'new zeland': 'Nova Zelândia',
     franca: 'França',
     italia: 'Itália',
     japao: 'Japão',
