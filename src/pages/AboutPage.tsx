@@ -1,6 +1,6 @@
 const TEAM_INFO = {
   project: 'Oracle Server Management System',
-  course: 'Projeto Interdisciplinar de Modelos (PIM)',
+  course: 'Projeto Integrado Multidisciplinar (PIM)',
   year: '2026',
   stack: ['React 19', 'TypeScript', 'Vite', 'TailwindCSS', 'FastAPI', 'Supabase'],
 }

@@ -25,6 +25,13 @@ interface ContinentOption {
   paises: CountryOption[]
 }
 
+interface CountryServerRecord {
+  id?: string | number
+  cidade?: string | null
+  capacidade_atual?: number | null
+  status?: string | boolean | null
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const COUNTRY_ISO2_BY_NAME: Record<string, string> = {
@@ -385,15 +392,15 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
         if (!res.ok) { setCheckingCapacity(false); return }
         const data = await res.json()
         if (!active) return
-        const servers = Array.isArray(data) ? data : []
-        if (servers.length >= 2) {
-          setCapacidadeError(`Limite de servidores atingido para ${pais}.`)
-        } else if (servers.length === 1) {
-          const srv = servers[0] as Record<string, unknown>
-          const capacidadeAtual = typeof srv.capacidade_atual === 'number' ? srv.capacidade_atual : 0
-          if (capacidadeAtual < CAPACIDADE_80) {
-            setCapacidadeError(`O servidor em ${pais} ainda não atingiu 80% de uso (${capacidadeAtual}/${CAPACIDADE_TOTAL}).`)
-          }
+        const servers = (Array.isArray(data) ? data : []) as CountryServerRecord[]
+        const activeServers = servers.filter(s => isAtivo(s.status))
+        const hasCountryCapacityBlock = activeServers.some(s => {
+          const capacidadeAtual = typeof s.capacidade_atual === 'number' ? s.capacidade_atual : 0
+          return capacidadeAtual < CAPACIDADE_80
+        })
+
+        if (hasCountryCapacityBlock) {
+          setCapacidadeError(`Ainda não é possível mover para ${pais}. Um servidor no país precisa atingir 80% de uso.`)
         }
       } catch { /* allow submit */ } finally {
         if (active) setCheckingCapacity(false)
@@ -447,6 +454,25 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
     setError(null)
     setLoading(true)
     try {
+      if (pais && cidade) {
+        const countryRes = await fetch(`${API_BASE}/servidores/paises/${encodeURIComponent(pais)}`)
+        if (countryRes.ok) {
+          const countryData = await countryRes.json().catch(() => [])
+          const countryServers = (Array.isArray(countryData) ? countryData : []) as CountryServerRecord[]
+
+          const hasCityConflict = countryServers.some(server => {
+            if (!server.cidade) return false
+            if (String(server.id ?? '') === String(servidor.id)) return false
+            return normalizeName(server.cidade) === normalizeName(cidade)
+          })
+
+          if (hasCityConflict) {
+            setError(`Já existe servidor cadastrado na cidade ${cidade}. Escolha outra cidade.`)
+            return
+          }
+        }
+      }
+
       const body: Record<string, string | number> = {}
       if (nome.trim()) body.nome = nome.trim()
       if (pais) body.pais = pais

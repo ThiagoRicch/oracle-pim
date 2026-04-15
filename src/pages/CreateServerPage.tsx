@@ -42,7 +42,16 @@ interface ContinentOption {
   paises: CountryOption[]
 }
 
+interface CountryServerRecord {
+  id?: string | number
+  cidade?: string | null
+  capacidade_atual?: number | null
+  status?: string | boolean | null
+}
+
 const GEOGRAPHY_ENDPOINTS = ['/geografia/', '/geografia']
+const CAPACIDADE_TOTAL = 4096
+const CAPACIDADE_80 = Math.floor(CAPACIDADE_TOTAL * 0.8)
 
 const COUNTRY_ISO2_BY_NAME: Record<string, string> = {
   brasil: 'BR',
@@ -86,6 +95,15 @@ function toNumber(value: unknown): number | null {
     return Number.isFinite(parsed) ? parsed : null
   }
   return null
+}
+
+function isAtivo(status?: string | boolean | null): boolean {
+  if (typeof status === 'boolean') return status
+  if (typeof status === 'string') {
+    const n = status.trim().toLowerCase()
+    return n === 'ativo' || n === 'active' || n === 'true'
+  }
+  return true
 }
 
 function toFlagFromIso2(iso2: string): string {
@@ -466,6 +484,34 @@ export function CreateServerPage() {
     setLoading(true)
 
     try {
+      const countryRes = await fetch(`${API_BASE}/servidores/paises/${encodeURIComponent(form.pais)}`)
+      if (countryRes.ok) {
+        const countryData = await countryRes.json().catch(() => [])
+        const countryServers = (Array.isArray(countryData) ? countryData : []) as CountryServerRecord[]
+
+        const hasCityConflict = countryServers.some(server => {
+          if (!server.cidade || !form.cidade) return false
+          return normalizeName(server.cidade) === normalizeName(form.cidade)
+        })
+
+        if (hasCityConflict) {
+          setError(`Já existe servidor cadastrado na cidade ${form.cidade}. Escolha outra cidade.`)
+          return
+        }
+
+        const hasCountryCapacityBlock = countryServers
+          .filter(server => isAtivo(server.status))
+          .some(server => {
+            const capacidadeAtual = typeof server.capacidade_atual === 'number' ? server.capacidade_atual : 0
+            return capacidadeAtual < CAPACIDADE_80
+          })
+
+        if (hasCountryCapacityBlock) {
+          setError(`Ainda não é possível adicionar outro servidor em ${form.pais}. Um servidor no país precisa atingir 80% de uso.`)
+          return
+        }
+      }
+
       const res = await fetch(`${API_BASE}/servidores/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

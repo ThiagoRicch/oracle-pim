@@ -10,6 +10,9 @@ export function normalizeCountryLabel(value: string): string {
   const alias: Record<string, string> = {
     nova: 'Nova Zelândia',
     'nova zelandia': 'Nova Zelândia',
+    'nova zelândia': 'Nova Zelândia',
+    'nova zealandia': 'Nova Zelândia',
+    'new zealand': 'Nova Zelândia',
     franca: 'França',
     italia: 'Itália',
     japao: 'Japão',
