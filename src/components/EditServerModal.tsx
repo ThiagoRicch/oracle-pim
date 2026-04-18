@@ -299,6 +299,17 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
   const [localAtivo, setLocalAtivo] = useState(true)
   const [statusLoading, setStatusLoading] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [confirmVisible, setConfirmVisible] = useState(false)
+
+  function openConfirm() {
+    setShowConfirm(true)
+    requestAnimationFrame(() => requestAnimationFrame(() => setConfirmVisible(true)))
+  }
+
+  function closeConfirm() {
+    setConfirmVisible(false)
+    setTimeout(() => setShowConfirm(false), 280)
+  }
 
   // ── Form state ───────────────────────────────────────────────────────────
   const [nome, setNome] = useState('')
@@ -430,7 +441,7 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
     if (!servidor || statusLoading) return
     if (localAtivo) {
       // Desativar → pede confirmação primeiro
-      setShowConfirm(true)
+      openConfirm()
     } else {
       // Reativar → direto
       confirmStatusChange(true)
@@ -439,7 +450,7 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
 
   async function confirmStatusChange(novoStatus: boolean) {
     if (!servidor) return
-    setShowConfirm(false)
+    closeConfirm()
     setStatusLoading(true)
     try {
       const res = await fetch(`${API_BASE}/servidores/${servidor.id}/status`, {
@@ -749,9 +760,17 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
 
         {/* ── Overlay de confirmação de desativação ───────────────────────── */}
         {showConfirm && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/70 backdrop-blur-[2px]">
+          <div className={[
+            'absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/70 backdrop-blur-[2px]',
+            'transition-opacity duration-280 ease-out',
+            confirmVisible ? 'opacity-100' : 'opacity-0',
+          ].join(' ')}>
             <div
-              className="mx-5 w-full rounded-2xl border border-[--color-border] p-6 shadow-2xl"
+              className={[
+                'mx-5 w-full rounded-2xl border border-[--color-border] p-6 shadow-2xl',
+                'transition-all duration-280 ease-out',
+                confirmVisible ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-3',
+              ].join(' ')}
               style={{ backgroundColor: 'var(--color-sidebar-bg)' }}
             >
               <div className="mb-1 flex items-center gap-2">
@@ -766,7 +785,7 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setShowConfirm(false)}
+                  onClick={() => closeConfirm()}
                   className="flex-1 rounded-xl border border-[--color-border] bg-[--color-main-bg] py-2 text-sm font-medium text-[--color-text-secondary] transition-colors hover:text-[--color-text-primary] hover:border-[--color-text-secondary]/40"
                 >
                   Cancelar
