@@ -63,12 +63,13 @@ Cada notificacao pode incluir snapshot de antes/depois e contexto tecnico (ex.: 
 
 ### 2) Relatorios automaticos diarios e mensais
 
-A aplicacao gera relatorios consolidados por continente com:
+A aplicacao gera relatorios consolidados por pais com:
 
 - servidor e status
-- consumo energetico estimado
+- consumo energetico estimado (simulado com variacao diaria)
 - custo local e custo em USD
 - decisao de uso de energia solar com justificativa
+- resumo final com consumo total e custo total do pais
 
 ### 3) Controle de clima e decisao energetica solar
 
@@ -133,11 +134,11 @@ Trecho do corpo:
 - Motivo tecnico: Alta irradiacao prevista para o periodo
 - 06:00 da manha em Brasil: Sera ativado o uso de energia solar.
 
-### Exemplo 3: relatorio diario por continente
+### Exemplo 3: relatorio diario por pais
 
 Assunto:
 
-`Relatorio Diario - Europa`
+`Relatorio Diario - Brasil`
 
 Trecho do corpo:
 
@@ -146,6 +147,7 @@ Trecho do corpo:
 - Consumo: 128.4 kWh
 - Custo: EUR 46.12 | USD 50.08
 - Energia Solar: Ativada
+- Resumo do pais: consumo total e custo total do dia
 
 ---
 
