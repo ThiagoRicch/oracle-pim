@@ -363,7 +363,7 @@ export function HomePage() {
         <AddFileModal
           servidor={
             addFileServidor?.id != null
-              ? { id: addFileServidor.id, nome: addFileServidor.nome }
+              ? { id: addFileServidor.id, nome: addFileServidor.nome, pais: addFileServidor.pais }
               : null
           }
           isOpen={addFileServidor !== null}

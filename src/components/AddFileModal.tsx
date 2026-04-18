@@ -6,10 +6,51 @@ interface AddFileModalProps {
   servidor: {
     id: string | number
     nome: string
+    pais?: string
   } | null
   isOpen: boolean
   onClose: () => void
   onSuccess: () => void
+}
+
+const COUNTRY_ISO2_BY_NAME: Record<string, string> = {
+  brasil: 'BR',
+  argentina: 'AR',
+  colombia: 'CO',
+  peru: 'PE',
+  chile: 'CL',
+  'estados unidos': 'US',
+  canada: 'CA',
+  mexico: 'MX',
+  'costa rica': 'CR',
+  panama: 'PA',
+  alemanha: 'DE',
+  franca: 'FR',
+  'reino unido': 'GB',
+  italia: 'IT',
+  espanha: 'ES',
+  portugal: 'PT',
+  china: 'CN',
+  india: 'IN',
+  japao: 'JP',
+  nigeria: 'NG',
+  egito: 'EG',
+  'africa do sul': 'ZA',
+  australia: 'AU',
+  'nova zelandia': 'NZ',
+}
+
+function normalizeName(value: string): string {
+  return value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+}
+
+function getCountryIso2(countryName?: string): string {
+  if (!countryName) return ''
+  return (COUNTRY_ISO2_BY_NAME[normalizeName(countryName)] ?? '').toUpperCase()
+}
+
+function getFlagImageUrl(iso2: string): string {
+  return `https://flagcdn.com/w40/${iso2.toLowerCase()}.png`
 }
 
 const FILE_TYPES = [
@@ -222,6 +263,8 @@ export function AddFileModal({ servidor, isOpen, onClose, onSuccess }: AddFileMo
 
   if (!mounted || !servidor) return null
 
+  const paisIso2 = getCountryIso2(servidor.pais)
+
   const canSubmit =
     !loading &&
     titulo.trim().length > 0 &&
@@ -262,7 +305,20 @@ export function AddFileModal({ servidor, isOpen, onClose, onSuccess }: AddFileMo
         <div className="mb-4 flex items-start justify-between border-b border-[--color-border] pb-3">
           <div>
             <h3 className="text-2xl font-bold text-[--color-text-primary]">Adicionar Dados</h3>
-            <p className="mt-1 text-xs text-[--color-text-secondary]">Servidor: {servidor.nome}</p>
+            <p className="mt-1 flex items-center gap-2 text-xs text-[--color-text-secondary]">
+              {paisIso2 ? (
+                <img
+                  src={getFlagImageUrl(paisIso2)}
+                  alt={`Bandeira de ${servidor.pais ?? ''}`}
+                  className="h-3.5 w-5 shrink-0 rounded-[2px] object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="shrink-0">🏳️</span>
+              )}
+              <span>|</span>
+              <span>Servidor {servidor.nome}</span>
+            </p>
           </div>
           <button
             type="button"
