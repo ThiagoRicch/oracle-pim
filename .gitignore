@@ -28,8 +28,14 @@ dist/
 build/
 .env
 .env.local
+.env.*
+!.env.example
 .cache
 *.log
 .DS_Store
 .idea/
 .vscode/
+
+# Arquivos locais/sensiveis nao versionaveis
+src/assets/backend_docs.txt
+src/assets/projetogenovaflutter/
