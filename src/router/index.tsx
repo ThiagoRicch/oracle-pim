@@ -7,6 +7,7 @@ import { DashboardPage } from '../pages/DashboardPage'
 import { AboutPage } from '../pages/AboutPage'
 import { LoginPage } from '../pages/LoginPage'
 import { DisabledServersPage } from '../pages/DisabledServersPage'
+import { ClimatePage } from '../pages/ClimatePage'
 import { isAuthenticated } from '../utils/auth'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
       { path: 'criar-servidor', element: <CreateServerPage /> },
       { path: 'mapa', element: <MapPage /> },
       { path: 'dashboard', element: <DashboardPage /> },
+      { path: 'clima', element: <ClimatePage /> },
       { path: 'servidores-desativados', element: <DisabledServersPage /> },
       { path: 'sobre', element: <AboutPage /> },
     ],

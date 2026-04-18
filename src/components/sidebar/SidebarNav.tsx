@@ -1,5 +1,5 @@
 import { MenuItem } from './MenuItem'
-import { IconHome, IconServer, IconMap, IconDashboard, IconInfo, IconServerOff } from '../icons'
+import { IconHome, IconServer, IconMap, IconDashboard, IconInfo, IconServerOff, IconSun } from '../icons'
 import type { NavItem } from '../../types/navigation'
 
 const NAV_ITEMS: NavItem[] = [
@@ -26,6 +26,12 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Dashboard',
     path: '/dashboard',
     icon: <IconDashboard className="h-6 w-6" />,
+  },
+  {
+    id: 'climate',
+    label: 'Clima',
+    path: '/clima',
+    icon: <IconSun className="h-6 w-6" />,
   },
   {
     id: 'disabled-servers',
