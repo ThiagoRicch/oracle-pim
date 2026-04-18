@@ -489,10 +489,22 @@ export function CreateServerPage() {
         const countryData = await countryRes.json().catch(() => [])
         const countryServers = (Array.isArray(countryData) ? countryData : []) as CountryServerRecord[]
 
-        const hasCityConflict = countryServers.some(server => {
-          if (!server.cidade || !form.cidade) return false
-          return normalizeName(server.cidade) === normalizeName(form.cidade)
-        })
+        const occupiedCities = new Set(
+          countryServers
+            .filter(s => s.cidade)
+            .map(s => normalizeName(s.cidade!))
+        )
+        const allCities = selectedCountry?.cidades ?? []
+        const allCitiesOccupied =
+          allCities.length > 0 &&
+          allCities.every(city => occupiedCities.has(normalizeName(city.nome)))
+
+        if (allCitiesOccupied) {
+          setError(`Todas as cidades disponíveis em ${form.pais} já possuem servidores cadastrados. Não é possível adicionar mais servidores neste país.`)
+          return
+        }
+
+        const hasCityConflict = occupiedCities.has(normalizeName(form.cidade ?? ''))
 
         if (hasCityConflict) {
           setError(`Já existe servidor cadastrado na cidade ${form.cidade}. Escolha outra cidade.`)
