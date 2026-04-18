@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { LoadingSpinner } from '../components/LoadingSpinner'
 import { useTheme } from '../hooks/useTheme'
 import oracleLogo from '../assets/oracle.png'
 import { setAuthenticated } from '../utils/auth'
@@ -47,12 +48,6 @@ export function LoginPage() {
         boxShadow: 'inset 0 0 0 1000px #ffffff',
         WebkitBoxShadow: 'inset 0 0 0 1000px #ffffff',
       }
-
-  const buttonStyle = {
-    backgroundColor: '#f97316',
-    borderColor: '#f97316',
-    color: '#ffffff',
-  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -142,14 +137,11 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            style={buttonStyle}
-            className={[
-              'mt-2 self-center rounded-xl border px-8 py-3 text-base font-semibold text-white sm:min-w-56',
-              'transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent] focus-visible:ring-offset-2',
-              loading ? 'cursor-not-allowed opacity-50' : 'hover:opacity-90',
-            ].join(' ')}
+            className="rounded-full border border-[#f97316]/70 bg-[#f97316]/12 px-8 py-2.5 text-sm font-semibold text-[#f97316] transition-all duration-200 hover:bg-[#f97316]/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading
+              ? <span className="inline-flex items-center gap-2"><LoadingSpinner size="sm" />Entrando...</span>
+              : 'Entrar'}
           </button>
         </form>
       </div>

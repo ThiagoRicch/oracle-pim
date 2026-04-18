@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import serverDisabledImage from '../assets/server-disabled.png'
 import { IconInfo, IconRefreshCcw, IconSearch } from '../components/icons'
-import { LoadingPage } from '../components/LoadingSpinner'
+import { LoadingPage, LoadingSpinner } from '../components/LoadingSpinner'
 import { normalizeCountryLabel } from '../utils/countryLabel'
 import API_BASE from '../config/api'
 
@@ -387,9 +387,9 @@ export function DisabledServersPage() {
                 type="button"
                 onClick={handleConfirmReativar}
                 disabled={statusLoading}
-                className="flex-1 rounded-xl border border-emerald-500/70 bg-emerald-500/10 py-2 text-sm font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20 disabled:opacity-60"
+                className="flex-1 rounded-full border border-emerald-500/70 bg-emerald-500/10 px-8 py-2.5 text-sm font-semibold text-emerald-400 transition-all duration-200 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-40"
               >
-                {statusLoading ? 'Reativando...' : 'Sim, reativar'}
+                {statusLoading ? <span className="inline-flex items-center justify-center gap-2"><LoadingSpinner size="sm" color="emerald" />Reativando...</span> : 'Sim, reativar'}
               </button>
             </div>
           </div>

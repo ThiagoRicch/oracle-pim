@@ -642,11 +642,7 @@ export function CreateServerPage() {
           <button
             type="submit"
             disabled={!canSubmit}
-            className={[
-              'rounded-xl bg-[--color-accent] px-6 py-3 text-sm font-semibold text-white sm:py-3.5 sm:text-base',
-              'transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--color-accent]',
-              !canSubmit ? 'opacity-40 cursor-not-allowed' : 'hover:opacity-90',
-            ].join(' ')}
+            className="rounded-full border border-[#f97316]/70 bg-[#f97316]/12 px-8 py-2.5 text-sm font-semibold text-[#f97316] transition-all duration-200 hover:bg-[#f97316]/20 disabled:cursor-not-allowed disabled:opacity-40"
           >
             {loading ? (
               <span className="inline-flex items-center gap-2">

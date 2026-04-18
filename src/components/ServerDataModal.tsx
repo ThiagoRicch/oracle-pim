@@ -91,6 +91,9 @@ function isAtivo(status?: string | boolean | null): boolean {
 }
 
 export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: ServerDataModalProps) {
+  const INNER_MODAL_MS = 220
+  const INNER_MODAL_DELAY_MS = 16
+
   const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
 
@@ -100,6 +103,7 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
 
   const [deleteTarget, setDeleteTarget] = useState<ServerFile | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [deleteVisible, setDeleteVisible] = useState(false)
 
   const [editTarget, setEditTarget] = useState<ServerFile | null>(null)
   const [editTitulo, setEditTitulo] = useState('')
@@ -107,6 +111,7 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
   const [editTipo, setEditTipo] = useState('')
   const [editTamanho, setEditTamanho] = useState<number>(1)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [editVisible, setEditVisible] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -175,6 +180,20 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [isOpen, onClose, deleteTarget, editTarget])
 
+  useEffect(() => {
+    if (!deleteTarget) return
+    setDeleteVisible(false)
+    const t = setTimeout(() => setDeleteVisible(true), INNER_MODAL_DELAY_MS)
+    return () => clearTimeout(t)
+  }, [deleteTarget])
+
+  useEffect(() => {
+    if (!editTarget) return
+    setEditVisible(false)
+    const t = setTimeout(() => setEditVisible(true), INNER_MODAL_DELAY_MS)
+    return () => clearTimeout(t)
+  }, [editTarget])
+
   if (!mounted || !servidor) return null
 
   const ativo = isAtivo(servidor.status)
@@ -223,7 +242,8 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
         return
       }
 
-      setDeleteTarget(null)
+      setDeleteVisible(false)
+      setTimeout(() => setDeleteTarget(null), INNER_MODAL_MS)
       await reloadFiles()
       onChanged()
     } catch {
@@ -239,6 +259,16 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
     setEditDescricao(file.descricao ?? '')
     setEditTipo(file.tipo_arquivo)
     setEditTamanho(file.tamanho_gb)
+  }
+
+  function closeDeleteModal() {
+    setDeleteVisible(false)
+    setTimeout(() => setDeleteTarget(null), INNER_MODAL_MS)
+  }
+
+  function closeEditModal() {
+    setEditVisible(false)
+    setTimeout(() => setEditTarget(null), INNER_MODAL_MS)
   }
 
   async function saveEdit() {
@@ -267,7 +297,8 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
         return
       }
 
-      setEditTarget(null)
+      setEditVisible(false)
+      setTimeout(() => setEditTarget(null), INNER_MODAL_MS)
       await reloadFiles()
       onChanged()
     } catch {
@@ -355,7 +386,7 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
                 ? 'border-emerald-500/70 bg-emerald-500/10 text-emerald-400'
                 : 'border-red-500/70 bg-red-500/10 text-red-400',
             ].join(' ')}>
-              {ativo ? 'ativo' : 'inativo'}
+              {ativo ? 'Ativo' : 'Inativo'}
             </span>
             <button
               type="button"
@@ -443,8 +474,21 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
         </div>
 
         {deleteTarget && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-black/70 backdrop-blur-[2px] p-4">
-            <div className="w-full max-w-md rounded-2xl border border-[--color-border] p-5" style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
+          <div
+            className={[
+              'absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-black/70 backdrop-blur-[2px] p-4',
+              'transition-opacity duration-200 ease-out',
+              deleteVisible ? 'opacity-100' : 'opacity-0',
+            ].join(' ')}
+          >
+            <div
+              className={[
+                'w-full max-w-md rounded-2xl border border-[--color-border] p-5',
+                'transition-all duration-200 ease-out',
+                deleteVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95',
+              ].join(' ')}
+              style={{ backgroundColor: 'var(--color-sidebar-bg)' }}
+            >
               <h4 className="text-base font-semibold text-[--color-text-primary]">Excluir arquivo?</h4>
               <p className="mt-2 text-sm text-[--color-text-secondary]">
                 Você tem certeza que deseja excluir <span className="font-medium text-[--color-text-primary]">{deleteTarget.titulo}</span>?
@@ -452,7 +496,7 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
               <div className="mt-5 flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setDeleteTarget(null)}
+                  onClick={closeDeleteModal}
                   disabled={deleting}
                   className="flex-1 rounded-xl border border-[--color-border] bg-[--color-main-bg] py-2 text-sm font-medium text-[--color-text-secondary] transition-colors hover:text-[--color-text-primary] disabled:opacity-60"
                 >
@@ -462,9 +506,11 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
                   type="button"
                   onClick={confirmDelete}
                   disabled={deleting}
-                  className="flex-1 rounded-xl border border-red-500/70 bg-red-500/10 py-2 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/20 disabled:opacity-60"
+                  className="inline-flex flex-1 items-center justify-center rounded-xl border border-red-500/70 bg-red-500/10 py-2 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/20 disabled:opacity-60"
                 >
-                  {deleting ? 'Excluindo...' : 'Sim, excluir'}
+                  {deleting
+                    ? <span className="inline-flex items-center gap-2"><LoadingSpinner size="sm" />Excluindo...</span>
+                    : 'Sim, excluir'}
                 </button>
               </div>
             </div>
@@ -472,8 +518,21 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
         )}
 
         {editTarget && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-black/70 backdrop-blur-[2px] p-4">
-            <div className="w-full max-w-lg rounded-2xl border border-[--color-border] p-5" style={{ backgroundColor: 'var(--color-sidebar-bg)' }}>
+          <div
+            className={[
+              'absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-black/70 backdrop-blur-[2px] p-4',
+              'transition-opacity duration-200 ease-out',
+              editVisible ? 'opacity-100' : 'opacity-0',
+            ].join(' ')}
+          >
+            <div
+              className={[
+                'w-full max-w-lg rounded-2xl border border-[--color-border] p-5',
+                'transition-all duration-200 ease-out',
+                editVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95',
+              ].join(' ')}
+              style={{ backgroundColor: 'var(--color-sidebar-bg)' }}
+            >
               <h4 className="text-base font-semibold text-[--color-text-primary]">Editar arquivo</h4>
 
               <div className="mt-4 grid gap-3">
@@ -514,7 +573,7 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
               <div className="mt-5 flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setEditTarget(null)}
+                  onClick={closeEditModal}
                   disabled={savingEdit}
                   className="flex-1 rounded-xl border border-[--color-border] bg-[--color-main-bg] py-2 text-sm font-medium text-[--color-text-secondary] transition-colors hover:text-[--color-text-primary] disabled:opacity-60"
                 >
@@ -524,9 +583,11 @@ export function ServerDataModal({ servidor, isOpen, onClose, onChanged }: Server
                   type="button"
                   onClick={saveEdit}
                   disabled={!canSaveEdit}
-                  className="flex-1 rounded-xl border border-[#f97316]/70 bg-[#f97316]/12 py-2 text-sm font-semibold text-[#f97316] transition-colors hover:bg-[#f97316]/20 disabled:opacity-40"
+                  className="inline-flex flex-1 items-center justify-center rounded-xl border border-[#f97316]/70 bg-[#f97316]/12 py-2 text-sm font-semibold text-[#f97316] transition-colors hover:bg-[#f97316]/20 disabled:opacity-40"
                 >
-                  {savingEdit ? 'Salvando...' : 'Salvar'}
+                  {savingEdit
+                    ? <span className="inline-flex items-center gap-2"><LoadingSpinner size="sm" />Salvando...</span>
+                    : 'Salvar'}
                 </button>
               </div>
             </div>

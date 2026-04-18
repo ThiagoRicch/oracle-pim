@@ -306,6 +306,11 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
   const [pais, setPais] = useState('')
   const [cidade, setCidade] = useState('')
 
+  // ── Original values for change detection ──────────────────────────────────
+  const [originalNome, setOriginalNome] = useState('')
+  const [originalPais, setOriginalPais] = useState('')
+  const [originalCidade, setOriginalCidade] = useState('')
+
   // ── Geography ────────────────────────────────────────────────────────────
   const [continentes, setContinentes] = useState<ContinentOption[]>([])
   const [geoLoading, setGeoLoading] = useState(true)
@@ -336,10 +341,19 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
   // ── Pre-fill when modal opens ────────────────────────────────────────────
   useEffect(() => {
     if (!isOpen || !servidor) return
+    const normalizedPais = normalizeCountryLabel(servidor.pais)
+    const cidadeValor = servidor.cidade ?? ''
+    
     setNome(servidor.nome)
     setContinente(servidor.continente)
-    setPais(normalizeCountryLabel(servidor.pais))
-    setCidade(servidor.cidade ?? '')
+    setPais(normalizedPais)
+    setCidade(cidadeValor)
+    
+    // Store original values for change detection
+    setOriginalNome(servidor.nome)
+    setOriginalPais(normalizedPais)
+    setOriginalCidade(cidadeValor)
+    
     setLocalAtivo(isAtivo(servidor.status))
     setError(null)
     setCapacidadeError(null)
@@ -509,6 +523,11 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
   }
 
   const formDisabled = !localAtivo
+  const hasChanges =
+    nome.trim() !== originalNome.trim() ||
+    pais !== originalPais ||
+    cidade !== originalCidade
+  
   const canSubmit =
     !loading &&
     !geoLoading &&
@@ -516,7 +535,9 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
     !capacidadeError &&
     !formDisabled &&
     nome.trim().length > 0 &&
-    pais.length > 0
+    pais.length > 0 &&
+    hasChanges
+  const submitDisabled = loading || !canSubmit
 
   // ── Render ───────────────────────────────────────────────────────────────
   if (!mounted || !servidor) return null
@@ -716,12 +737,8 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
           <div className="flex justify-center mt-1">
             <button
               type="submit"
-              disabled={!canSubmit}
-              className="w-[180px] whitespace-nowrap rounded-full px-12 py-2.5 text-sm font-semibold text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{
-                backgroundColor: canSubmit ? '#f97316' : '#f97316',
-                opacity: canSubmit ? 1 : 0.4,
-              }}
+              disabled={submitDisabled}
+              className="rounded-full border border-[#f97316]/70 bg-[#f97316]/12 px-8 py-2.5 text-sm font-semibold text-[#f97316] transition-all duration-200 hover:bg-[#f97316]/20 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {loading
                 ? <span className="inline-flex items-center gap-2"><LoadingSpinner size="sm" />ALTERANDO...</span>
@@ -757,9 +774,12 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
                 <button
                   type="button"
                   onClick={() => confirmStatusChange(false)}
-                  className="flex-1 rounded-xl border border-red-500/70 bg-red-500/10 py-2 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/20"
+                  disabled={statusLoading}
+                  className="inline-flex flex-1 items-center justify-center rounded-xl border border-red-500/70 bg-red-500/10 py-2 text-sm font-semibold text-red-400 transition-colors hover:bg-red-500/20 disabled:opacity-60"
                 >
-                  Desativar
+                  {statusLoading
+                    ? <span className="inline-flex items-center gap-2"><LoadingSpinner size="sm" />Desativando...</span>
+                    : 'Desativar'}
                 </button>
               </div>
             </div>

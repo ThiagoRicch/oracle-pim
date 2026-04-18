@@ -87,7 +87,7 @@ export function AppLayout() {
       {logoutMounted && (
         <div
           className={[
-            'fixed inset-0 z-50 flex items-center justify-center p-4',
+            'fixed inset-0 z-[9999] flex items-center justify-center p-4',
             'transition-opacity duration-420 ease-[cubic-bezier(0.22,1,0.36,1)]',
             logoutVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
           ].join(' ')}

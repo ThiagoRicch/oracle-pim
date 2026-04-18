@@ -178,3 +178,13 @@ export function IconSearch({ className }: IconProps) {
     </svg>
   )
 }
+
+export function IconWind({ className }: IconProps) {
+  return (
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 8h10a3 3 0 1 0-3-3" />
+      <path d="M2 12h15a2 2 0 1 1-2 2" />
+      <path d="M4 16h9a3 3 0 1 1-3 3" />
+    </svg>
+  )
+}
