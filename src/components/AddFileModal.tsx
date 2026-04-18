@@ -317,7 +317,7 @@ export function AddFileModal({ servidor, isOpen, onClose, onSuccess }: AddFileMo
                 <span className="shrink-0">🏳️</span>
               )}
               <span>|</span>
-              <span>Servidor {servidor.nome}</span>
+              <span>{servidor.nome}</span>
             </p>
           </div>
           <button

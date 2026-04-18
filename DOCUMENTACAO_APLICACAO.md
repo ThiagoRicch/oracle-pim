@@ -82,7 +82,7 @@ O backend consulta clima por localizacao e define se a energia solar deve ser at
 ### 4) Agendador interno e controle seguro de jobs
 
 - Jobs internos para: clima, relatorio diario, relatorio mensal e decisao solar
-- Endpoints internos protegidos por segredo (`INTERNAL_CRON_SECRET`)
+- Endpoints internos protegidos por segredo configurado via ambiente
 - Suporte a idempotencia para evitar envio duplicado no mesmo periodo
 
 ---
