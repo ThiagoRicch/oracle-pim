@@ -626,7 +626,7 @@ export function EditServerModal({ servidor, isOpen, onClose, onSuccess }: EditSe
               title={localAtivo ? 'Clique para desativar' : 'Clique para ativar'}
             >
               {statusLoading
-                ? <LoadingSpinner size="sm" />
+                ? <LoadingSpinner size="sm" color="emerald" />
                 : localAtivo ? 'Ativo' : 'Desativado'}
             </button>
 
